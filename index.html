@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Daymark — Daily Progress Tracker</title>
+<style>
+:root{--bg:#0b1020;--panel:#121a2e;--panel2:#18233b;--line:#293650;--text:#eef3ff;--muted:#9eacc7;--accent:#8b9cff;--green:#2bc48a;--red:#ff6b7a;--yellow:#f6c85f}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top left,#172347 0%,var(--bg) 48%);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;color:var(--text);min-height:100vh}
+button,input,textarea,select{font:inherit}button{cursor:pointer;border:0;border-radius:11px;padding:10px 14px;font-weight:650;transition:.18s}button:hover{transform:translateY(-1px);filter:brightness(1.08)}
+.app{max-width:1220px;margin:auto;padding:28px 20px 48px}.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:25px}.brand{display:flex;align-items:center;gap:12px}.logo{width:45px;height:45px;border-radius:14px;background:linear-gradient(135deg,#9aabff,#6b79ed);display:grid;place-items:center;color:#10162a;font-size:23px;font-weight:900}.brand h1{font-size:23px;margin:0;letter-spacing:-.7px}.brand p{margin:3px 0 0;color:var(--muted);font-size:13px}.today-chip{border:1px solid var(--line);background:#141d33;padding:10px 13px;border-radius:12px;color:#c9d5f2;font-size:13px}
+h2{font-size:17px;margin:0 0 15px;letter-spacing:-.2px}.welcome{margin:0 0 22px}.welcome h2{font-size:27px;margin-bottom:5px}.welcome p{margin:0;color:var(--muted);font-size:14px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:20px}.stat,.panel{background:linear-gradient(150deg,rgba(24,35,59,.96),rgba(16,24,43,.98));border:1px solid var(--line);border-radius:18px}.stat{padding:17px}.stat .label{font-size:12px;color:var(--muted);margin-bottom:10px}.stat .num{font-size:28px;font-weight:800;letter-spacing:-1px}.stat .sub{font-size:12px;color:var(--muted);margin-top:5px}.main-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(340px,.9fr);gap:18px;align-items:start}.panel{padding:20px;margin-bottom:18px}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}.panel-head h2{margin:0}.subtle{font-size:12px;color:var(--muted)}
+.progress-wrap{background:#0b1223;border:1px solid #26334e;border-radius:999px;height:10px;overflow:hidden;margin:14px 0 8px}.progress-bar{height:100%;width:0;background:linear-gradient(90deg,#6c7df5,#41d5a0);border-radius:999px;transition:width .3s}.progress-row{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.add-form{display:grid;grid-template-columns:1fr auto;gap:9px;margin-bottom:16px}.field{width:100%;background:#0d1528;border:1px solid #30405e;color:var(--text);border-radius:11px;padding:12px 13px;outline:none}.field:focus{border-color:var(--accent);box-shadow:0 0 0 3px #8b9cff1c}.primary{background:var(--accent);color:#10162b}.secondary{background:#26334f;color:#e7edff}.danger{background:#40232e;color:#ffb4bd}.task-list{display:flex;flex-direction:column;gap:9px}.task{display:flex;align-items:center;gap:11px;background:#0d1528;border:1px solid #273550;border-radius:13px;padding:12px}.task.done{opacity:.7}.task.done .task-title{text-decoration:line-through;color:#9eb0c9}.check{width:21px;height:21px;flex:0 0 21px;border:1.5px solid #687a9c;border-radius:7px;background:transparent;padding:0;display:grid;place-items:center;color:#0d1725}.task.done .check{background:var(--green);border-color:var(--green)}.task-body{flex:1;min-width:0}.task-title{overflow-wrap:anywhere;font-size:14px}.task-meta{font-size:11px;color:var(--muted);margin-top:4px}.task-actions{display:flex;gap:5px}.icon-btn{background:#202d47;color:#c4d0e8;padding:7px 9px;border-radius:9px;font-size:12px}.empty{padding:22px 12px;text-align:center;color:var(--muted);border:1px dashed #34425d;border-radius:12px;font-size:13px}.calendar-top{display:flex;align-items:center;gap:8px}.month-title{font-size:15px;font-weight:750;min-width:130px;text-align:center}.nav-btn{padding:7px 10px;background:#202d47;color:#e6ecff}.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}.weekday{text-align:center;color:#8192b2;font-size:11px;padding:7px 0}.day{min-height:63px;position:relative;border:1px solid #293650;background:#0d1528;color:#e7edff;border-radius:10px;padding:7px 5px;text-align:left;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start}.day .day-num{font-size:12px;font-weight:700}.day .day-mark{font-size:10px;align-self:center}.day.outside{opacity:.32}.day.today{border:1px solid #9aa8ff;box-shadow:inset 0 0 0 1px #9aa8ff25}.day.complete{background:#103b32;border-color:#25896a}.day.partial{background:#40371b;border-color:#92762b}.day.incomplete{background:#401f2a;border-color:#8e3b4c}.day.selected{outline:2px solid #aab5ff;outline-offset:1px}.legend{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0 0;color:var(--muted);font-size:11px}.legend span{display:flex;align-items:center;gap:6px}.dot{width:9px;height:9px;border-radius:3px;display:inline-block}.detail-box{background:#0d1528;border:1px solid #293650;border-radius:13px;padding:13px;margin-top:14px}.detail-title{font-size:13px;font-weight:750;margin-bottom:7px}.detail-line{font-size:12px;color:var(--muted);margin:4px 0}.history-list{display:flex;flex-direction:column;gap:9px}.history-row{display:flex;align-items:center;gap:10px;background:#0d1528;border:1px solid #273550;border-radius:12px;padding:11px 12px}.history-date{min-width:72px;font-size:12px;font-weight:750}.mini-track{height:6px;border-radius:99px;background:#25324b;overflow:hidden;flex:1}.mini-fill{height:100%;background:var(--green);border-radius:99px}.history-pct{font-size:12px;color:#cbd6ef;min-width:35px;text-align:right}.small-note{font-size:11px;color:var(--muted);line-height:1.5}.settings-row{display:flex;gap:9px;flex-wrap:wrap}.file-label{display:inline-flex;align-items:center;gap:7px;background:#26334f;color:#e7edff;padding:10px 14px;border-radius:11px;font-size:13px;font-weight:650;cursor:pointer}.file-label input{display:none}
+.modal-backdrop{position:fixed;inset:0;background:#030713c9;backdrop-filter:blur(7px);display:none;align-items:center;justify-content:center;padding:20px;z-index:10}.modal-backdrop.show{display:flex}.modal{max-width:430px;width:100%;background:#17233c;border:1px solid #425276;border-radius:23px;padding:27px;text-align:center;box-shadow:0 25px 90px #0009;animation:pop .25s ease-out}.celebrate{font-size:45px;margin-bottom:9px}.modal h2{font-size:24px;margin-bottom:9px}.modal p{color:#b8c5df;font-size:14px;line-height:1.55}.modal .primary{margin-top:12px;min-width:130px}@keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#e7edff;color:#111a30;padding:12px 17px;border-radius:12px;box-shadow:0 8px 30px #0005;font-size:13px;font-weight:650;display:none;z-index:20}.toast.show{display:block}
+@media(max-width:850px){.main-grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.day{min-height:55px}.app{padding:20px 13px 35px}.panel{padding:16px}}@media(max-width:430px){.top{align-items:flex-start;flex-direction:column}.welcome h2{font-size:23px}.stat .num{font-size:24px}.calendar-grid{gap:3px}.day{padding:5px 3px;min-height:48px}.day .day-mark{font-size:8px}.month-title{min-width:115px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand"><div class="logo">✓</div><div><h1>Daymark</h1><p>Your daily goals, made visible.</p></div></div>
+    <div class="today-chip" id="todayChip"></div>
+  </header>
+  <section class="welcome"><h2 id="greeting">Make today count.</h2><p>Plan your day, check off what you finish, and build consistency one day at a time.</p></section>
+  <section class="stats">
+    <div class="stat"><div class="label">TODAY'S PROGRESS</div><div class="num" id="statProgress">0%</div><div class="sub" id="statTaskCount">0 of 0 tasks done</div></div>
+    <div class="stat"><div class="label">COMPLETED DAYS</div><div class="num" id="statCompleted">0</div><div class="sub">All planned tasks finished</div></div>
+    <div class="stat"><div class="label">CURRENT STREAK</div><div class="num" id="statStreak">0 🔥</div><div class="sub">Completed days in a row</div></div>
+    <div class="stat"><div class="label">TASKS COMPLETED</div><div class="num" id="statTotalTasks">0</div><div class="sub">Across all saved days</div></div>
+  </section>
+  <div class="main-grid">
+    <div>
+      <section class="panel">
+        <div class="panel-head"><h2>Today's checklist</h2><span class="subtle" id="taskDateLabel"></span></div>
+        <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+        <div class="progress-row"><span id="progressText">Let's get started</span><span id="progressPercent">0%</span></div>
+        <form class="add-form" id="taskForm"><input class="field" id="taskInput" maxlength="140" placeholder="Add a task (e.g. Solve 2 DSA problems)" required /><button class="primary" type="submit">+ Add</button></form>
+        <div class="task-list" id="taskList"></div>
+        <p class="small-note" style="margin:14px 0 0">Tip: your checklist is saved automatically in this browser. Add recurring daily tasks again when needed, or use the copy feature to bring yesterday's plan forward.</p>
+      </section>
+      <section class="panel">
+        <div class="panel-head"><h2>Progress history</h2><span class="subtle">Recent days</span></div>
+        <div class="history-list" id="historyList"></div>
+      </section>
+    </div>
+    <div>
+      <section class="panel">
+        <div class="panel-head"><h2>Activity calendar</h2><div class="calendar-top"><button class="nav-btn" id="prevMonth" aria-label="Previous month">‹</button><div class="month-title" id="monthTitle"></div><button class="nav-btn" id="nextMonth" aria-label="Next month">›</button></div></div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+        <div class="legend"><span><i class="dot" style="background:#25896a"></i> Complete</span><span><i class="dot" style="background:#92762b"></i> In progress</span><span><i class="dot" style="background:#8e3b4c"></i> Incomplete</span><span><i class="dot" style="background:#293650"></i> No tasks</span></div>
+        <div class="detail-box" id="dayDetail"><div class="detail-title">Select a date</div><div class="detail-line">Click any calendar day to see its progress and tasks.</div></div>
+      </section>
+      <section class="panel">
+        <div class="panel-head"><h2>Manage your data</h2></div>
+        <p class="small-note" style="margin-top:0">Your information stays in this browser on this device. Export a backup to keep it safe or move it to another browser.</p>
+        <div class="settings-row" style="margin:14px 0 12px"><button class="secondary" id="exportBtn">Export backup</button><label class="file-label">Import backup<input type="file" id="importFile" accept=".json,application/json"></label></div>
+        <div class="settings-row"><button class="secondary" id="copyYesterdayBtn">Copy yesterday's tasks</button><button class="danger" id="clearTodayBtn">Clear today's tasks</button></div>
+        <p class="small-note" style="margin-bottom:0">Note: browser data can be lost if you clear site data or use a different browser/device. Export backups regularly.</p>
+      </section>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop" id="completionModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal"><div class="celebrate">🎉</div><h2 id="modalTitle">Day completed!</h2><p id="modalMessage">You've finished every task you planned for today. Your calendar day is now marked complete.</p><button class="primary" id="closeModal">Awesome!</button></div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+(() => {
+  const STORE_KEY = 'daymark_tracker_v1';
+  const $ = id => document.getElementById(id);
+  const dateKey = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const parseKey = k => { const [y,m,d]=k.split('-').map(Number); return new Date(y,m-1,d); };
+  const today = () => dateKey(new Date());
+  const niceDate = (k, opts={weekday:'short',month:'short',day:'numeric'}) => parseKey(k).toLocaleDateString(undefined,opts);
+  let state = loadState();
+  let viewDate = new Date();
+  let selectedDate = today();
+  let previousCompletionState = false;
+  let modalShownFor = '';
+  function loadState(){
+    try { const raw=localStorage.getItem(STORE_KEY); if(raw){const parsed=JSON.parse(raw); if(parsed && parsed.days) return parsed;} } catch(e){}
+    return {days:{}, version:1};
+  }
+  function save(){ try{localStorage.setItem(STORE_KEY,JSON.stringify(state));}catch(e){toast('Could not save: browser storage may be full. Export a backup.');} }
+  function dayData(k){ if(!state.days[k]) state.days[k]={tasks:[],celebrationShown:false}; if(!Array.isArray(state.days[k].tasks))state.days[k].tasks=[]; return state.days[k]; }
+  function getStats(k){const tasks=(state.days[k]?.tasks)||[]; const done=tasks.filter(t=>t.done).length;return {tasks,done,total:tasks.length,pct:tasks.length?Math.round(done/tasks.length*100):0,complete:tasks.length>0&&done===tasks.length};}
+  function toast(msg){const el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('show'),2600);}
+  function render(){
+    const k=today(), d=dayData(k), s=getStats(k);
+    $('todayChip').textContent=new Date().toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric',year:'numeric'});
+    const hour=new Date().getHours(); $('greeting').textContent=hour<12?'Good morning. Make today count.':hour<17?'Good afternoon. Keep your momentum.':'Good evening. Finish strong.';
+    $('taskDateLabel').textContent=niceDate(k,{month:'short',day:'numeric'});
+    $('statProgress').textContent=s.pct+'%'; $('statTaskCount').textContent=`${s.done} of ${s.total} tasks done`;
+    $('progressBar').style.width=s.pct+'%'; $('progressPercent').textContent=s.pct+'%';
+    $('progressText').textContent=s.total===0?'Add your first task to start tracking.':s.complete?'All tasks complete — amazing work!':`${s.total-s.done} task${s.total-s.done===1?'':'s'} left to go`;
+    $('taskList').innerHTML='';
+    if(!s.tasks.length){$('taskList').innerHTML='<div class="empty">No tasks yet. Add the first thing you want to finish today.</div>';}
+    s.tasks.forEach(task=>{
+      const row=document.createElement('div');row.className='task'+(task.done?' done':'');
+      const check=document.createElement('button');check.className='check';check.setAttribute('aria-label',task.done?'Mark incomplete':'Mark complete');check.innerHTML=task.done?'✓':'';
+      check.onclick=()=>toggleTask(k,task.id);
+      const body=document.createElement('div');body.className='task-body';
+      const title=document.createElement('div');title.className='task-title';title.textContent=task.title;
+      const meta=document.createElement('div');meta.className='task-meta';meta.textContent=task.done?'Completed ✓':'To do';
+      body.append(title,meta);
+      const actions=document.createElement('div');actions.className='task-actions';
+      const edit=document.createElement('button');edit.className='icon-btn';edit.textContent='Edit';edit.onclick=()=>editTask(k,task.id);
+      const del=document.createElement('button');del.className='icon-btn';del.textContent='×';del.title='Delete task';del.onclick=()=>deleteTask(k,task.id);
+      actions.append(edit,del);row.append(check,body,actions);$('taskList').append(row);
+    });
+    const keys=Object.keys(state.days).sort();let completedDays=0,totalDone=0;
+    keys.forEach(key=>{const st=getStats(key);if(st.complete)completedDays++;totalDone+=st.done;});
+    $('statCompleted').textContent=completedDays;$('statTotalTasks').textContent=totalDone;$('statStreak').textContent=calcStreak()+' 🔥';
+    renderCalendar();renderHistory();
+    if(selectedDate===k)renderDayDetail(selectedDate);
+  }
+  function calcStreak(){let d=parseKey(today()),count=0;let first=getStats(dateKey(d));if(!first.complete){d.setDate(d.getDate()-1);if(!getStats(dateKey(d)).complete)return 0;}while(true){const key=dateKey(d);if(getStats(key).complete){count++;d.setDate(d.getDate()-1);}else break;}return count;}
+  function toggleTask(k,id){const data=dayData(k),task=data.tasks.find(t=>t.id===id);if(!task)return;task.done=!task.done;save();const s=getStats(k);render();if(s.complete&&!data.celebrationShown){data.celebrationShown=true;save();showCompletion(k,s);}else if(!s.complete){data.celebrationShown=false;save();}}
+  function showCompletion(k,s){$('modalTitle').textContent=k===today()?'Day completed!':'Date completed!';$('modalMessage').textContent=`You finished all ${s.total} planned task${s.total===1?'':'s'} for ${k===today()?'today':niceDate(k,{weekday:'long',month:'long',day:'numeric'})}. The calendar day is marked green. Keep it going!`;$('completionModal').classList.add('show');}
+  function editTask(k,id){const task=dayData(k).tasks.find(t=>t.id===id);if(!task)return;const value=prompt('Edit task:',task.title);if(value===null)return;const trimmed=value.trim();if(!trimmed){toast('Task name cannot be empty.');return;}task.title=trimmed;save();render();}
+  function deleteTask(k,id){const data=dayData(k);data.tasks=data.tasks.filter(t=>t.id!==id);if(!getStats(k).complete)data.celebrationShown=false;save();render();toast('Task deleted.');}
+  function addTask(e){if(e)e.preventDefault();const input=$('taskInput');const title=input.value.trim();if(!title){input.focus();toast('Type a task first.');return;}const data=dayData(today());const id=(window.crypto&&typeof window.crypto.randomUUID==='function')?window.crypto.randomUUID():('task-'+Date.now()+'-'+Math.random().toString(36).slice(2));data.tasks.push({id,title,done:false,createdAt:new Date().toISOString()});data.celebrationShown=false;input.value='';save();render();input.focus();}
+  $('taskForm').addEventListener('submit',addTask);
+  $('taskInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addTask();}});
+  function renderCalendar(){
+    const year=viewDate.getFullYear(),month=viewDate.getMonth();$('monthTitle').textContent=viewDate.toLocaleDateString(undefined,{month:'long',year:'numeric'});
+    const grid=$('calendarGrid');grid.innerHTML='';['S','M','T','W','T','F','S'].forEach(w=>{const el=document.createElement('div');el.className='weekday';el.textContent=w;grid.append(el);});
+    const first=new Date(year,month,1),start=new Date(year,month,1-first.getDay()),currentMonth=month;
+    for(let i=0;i<42;i++){const date=new Date(start);date.setDate(start.getDate()+i);const key=dateKey(date),s=getStats(key),btn=document.createElement('button');btn.className='day';if(date.getMonth()!==currentMonth)btn.classList.add('outside');if(key===today())btn.classList.add('today');if(key===selectedDate)btn.classList.add('selected');if(s.complete)btn.classList.add('complete');else if(s.total>0&&s.done>0)btn.classList.add('partial');else if(s.total>0&&key<today())btn.classList.add('incomplete');
+      const num=document.createElement('span');num.className='day-num';num.textContent=date.getDate();const mark=document.createElement('span');mark.className='day-mark';mark.textContent=s.total?(s.complete?'✓':`${s.done}/${s.total}`):'';btn.append(num,mark);btn.title=s.total?`${s.done}/${s.total} tasks completed`:'No tasks recorded';btn.onclick=()=>{selectedDate=key;renderCalendar();renderDayDetail(key);};grid.append(btn);
+    }
+  }
+  function renderDayDetail(k){const s=getStats(k),box=$('dayDetail');box.innerHTML='';const title=document.createElement('div');title.className='detail-title';title.textContent=niceDate(k,{weekday:'long',month:'long',day:'numeric',year:'numeric'});box.append(title);const line=document.createElement('div');line.className='detail-line';line.textContent=s.total?(s.complete?'✓ Complete day':`${s.pct}% complete · ${s.done} of ${s.total} tasks`):'No tasks were recorded for this day.';box.append(line);if(s.total){s.tasks.forEach(t=>{const l=document.createElement('div');l.className='detail-line';l.textContent=(t.done?'✓ ':'○ ')+t.title;box.append(l);});if(k===today()){const note=document.createElement('div');note.className='detail-line';note.textContent='Use the checklist on the left to update today.';box.append(note);}}}
+  function renderHistory(){const el=$('historyList');el.innerHTML='';const keys=Object.keys(state.days).sort().reverse().slice(0,7);if(!keys.length){el.innerHTML='<div class="empty">Your daily progress will appear here.</div>';return;}keys.forEach(k=>{const s=getStats(k),row=document.createElement('div');row.className='history-row';const date=document.createElement('div');date.className='history-date';date.textContent=niceDate(k,{month:'short',day:'numeric'});const track=document.createElement('div');track.className='mini-track';const fill=document.createElement('div');fill.className='mini-fill';fill.style.width=s.pct+'%';track.append(fill);const pct=document.createElement('div');pct.className='history-pct';pct.textContent=s.pct+'%';row.append(date,track,pct);row.title=`${s.done}/${s.total} tasks completed`;row.onclick=()=>{selectedDate=k;viewDate=parseKey(k);renderCalendar();renderDayDetail(k);};row.style.cursor='pointer';el.append(row);});}
+  $('prevMonth').onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1);renderCalendar();};
+  $('nextMonth').onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);renderCalendar();};
+  $('closeModal').onclick=()=>$('completionModal').classList.remove('show');
+  $('completionModal').addEventListener('click',e=>{if(e.target===$('completionModal'))$('completionModal').classList.remove('show');});
+  $('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`daymark-backup-${today()}.json`;a.click();URL.revokeObjectURL(url);toast('Backup exported.');};
+  $('importFile').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{const imported=JSON.parse(await file.text());if(!imported||!imported.days||typeof imported.days!=='object')throw new Error('Invalid backup');if(!confirm('Import this backup and replace the data currently saved in this browser? Export your current data first if you want to keep it.'))return;state=imported;save();selectedDate=today();render();toast('Backup imported successfully.');}catch(err){alert('Could not import this file. Please choose a valid Daymark JSON backup.');}finally{e.target.value='';}});
+  $('copyYesterdayBtn').onclick=()=>{const y=parseKey(today());y.setDate(y.getDate()-1);const prev=state.days[dateKey(y)];if(!prev||!prev.tasks.length){toast('No tasks found for yesterday.');return;}const current=dayData(today());if(current.tasks.length&&!confirm('Add yesterday’s tasks to today? Existing tasks will stay.'))return;prev.tasks.forEach(t=>current.tasks.push({id:(crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random())),title:t.title,done:false,createdAt:new Date().toISOString()}));current.celebrationShown=false;save();render();toast('Yesterday’s tasks copied to today.');};
+  $('clearTodayBtn').onclick=()=>{if(!confirm('Delete all of today’s tasks? This cannot be undone unless you have a backup.'))return;state.days[today()]={tasks:[],celebrationShown:false};save();render();toast('Today’s tasks cleared.');};
+  // Initial calendar selection is today; preserve any existing local data.
+  dayData(today());save();render();
+})();
+</script>
+</body>
+</html>
